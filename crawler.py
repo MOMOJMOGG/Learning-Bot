@@ -130,9 +130,9 @@ if __name__ == '__main__':
         page += 1
 
     # === 儲存為 JSON 檔案 ===
-    with open("sat_sources.json", "w", encoding="utf-8") as f:
+    with open("data/sat_courses.json", "w", encoding="utf-8") as f:
         json.dump(course_data_list, f, ensure_ascii=False, indent=2)
         
-    print(f"✅ 已成功儲存 {len(course_data_list)} 筆課程資料至 sat_sources.json")
+    print(f"✅ 已成功儲存 {len(course_data_list)} 筆課程資料至 sat_courses.json")
         
         
