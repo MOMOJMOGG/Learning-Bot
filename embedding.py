@@ -3,12 +3,16 @@ from chromadb import PersistentClient
 import json
 import os
 from sentence_transformers import SentenceTransformer
+import sys
 import time
 
 if __name__ == "__main__":
     course_file = "data/sat_courses.json"
     chroma_dir  = "./chroma_db"
     collection_name = "sat_courses" 
+    
+    # === Step 0: 可選參數 --force-rebuild 支援 ===
+    force_rebuild = "--force-rebuild" in sys.argv
     
     # === Step 1: 載入課程 JSON 檔 ===
     if not os.path.exists(course_file):
@@ -18,6 +22,7 @@ if __name__ == "__main__":
         courses = json.load(f)
     
     start = time.time()
+    
     # === Step 2: 提取文字內容與 metadata ===
     documents = []
     metadatas = []
@@ -44,6 +49,9 @@ if __name__ == "__main__":
             'platform': course['platform']
         })
     
+    # ✅ 自動生成唯一 ID
+    ids = [str(i) for i in range(len(documents))]
+
     # === Step 3. 建立文本向量 ===
     model = SentenceTransformer("all-MiniLM-L6-v2")     #? 小型快模型
     embeddings = model.encode(documents, show_progress_bar=True)
@@ -51,16 +59,20 @@ if __name__ == "__main__":
     # === Step 4. 初始化 Chroma 向量資料庫 ===
     chroma_client = PersistentClient(path=chroma_dir)
     
+    if force_rebuild:
+        if collection_name in [c.name for c in chroma_client.list_collections()]:
+            chroma_client.delete_collection(name=collection_name)
+            print(f"⚠️ 已刪除舊的 collection: {collection_name}")
+
     if collection_name in [c.name for c in chroma_client.list_collections()]:
         collection = chroma_client.get_collection(name=collection_name)
         print(f"✅ 已載入現有 collection: {collection_name}")
-    
     else:
         collection = chroma_client.create_collection(name=collection_name)
         print(f"✅ 建立新 collection: {collection_name}")
-    
+
     # === Step 5. 新增資料 (避免重複)
-    existing_ids = set(collection.get(ids=ids)["ids"]) if len(ids) else set()
+    existing_ids = set(collection.get()["ids"])
     new_docs   = []
     new_ids    = []
     new_metas  = []
@@ -76,8 +88,8 @@ if __name__ == "__main__":
     if new_docs:
         collection.add(
             documents=new_docs,
-            embeddings=new_metas,
-            metadatas=new_embeds,
+            embeddings=new_embeds,
+            metadatas=new_metas,
             ids=new_ids
         )
         print(f"✅ 新增 {len(new_docs)} 筆資料")
@@ -87,5 +99,4 @@ if __name__ == "__main__":
     
     # === Step 6: 儲存資料庫到磁碟 ===
     end = time.time()
-    
-    print(f"✅ 向量資料庫已儲存到 {chroma_dir}，耗時: {end - start} 秒")
+    print(f"✅ 向量資料庫已儲存到 {chroma_dir}，耗時: {end - start:.2f} 秒")

@@ -1,1 +1,6 @@
 *.sqlite3
+*.db
+.env
+
+chroma_db/
+result/
