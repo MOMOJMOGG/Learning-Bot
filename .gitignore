@@ -1,6 +1,8 @@
 *.sqlite3
 *.db
+*.pyc
 .env
 
 chroma_db/
 result/
+.vscode/

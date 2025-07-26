@@ -1,5 +1,6 @@
-from dotenv import load_dotenv
+
 from chromadb import PersistentClient
+from dotenv import load_dotenv
 import json
 import os
 import openai
@@ -10,7 +11,7 @@ import time
 load_dotenv()
 
 # 初始化 OpenAI API
-openai.api_key = os.environ.get("OPAI_API_KEY")
+openai.api_key = os.getenv("OPAI_API_KEY")
 
 # 查詢 OpenAI embedding
 def get_openai_embedding(text: str) -> list:
@@ -55,7 +56,9 @@ if __name__ == "__main__":
             'price': course['price']['price'],
             'rating': course['rating']['rate'],
             'category': course['category']['name'],
-            'platform': course['platform']
+            'platform': course['platform'],
+            'duration': course['info']['duration'],
+            'image': course.get('image', "")
         })
 
     ids = [str(i) for i in range(len(documents))]
