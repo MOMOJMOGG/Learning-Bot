@@ -127,7 +127,9 @@ learning-bot/
 
 | Example of RAG-powered course recommendation in LINE Flex Message
 
-![Image][demo-video]
+![Image][demo-image1]
+![Image][demo-image2]
 
 [Line Developer]: https://www.youtube.com/watch?v=Mw3cODdkaFM
-[demo-video]: https://github.com/MOMOJMOGG/learning-bot/blob/main/demo/demo.mp4
+[demo-image1]: https://github.com/MOMOJMOGG/learning-bot/blob/main/demo/demo1.png
+[demo-image2]: https://github.com/MOMOJMOGG/learning-bot/blob/main/demo/demo2.png
